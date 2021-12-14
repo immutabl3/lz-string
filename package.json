@@ -1,0 +1,29 @@
+{
+  "name": "@immutabl3/lz-string",
+  "version": "0.0.1",
+  "description": "LZ-based compression algorithm",
+  "main": "src/index.js",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "test": "NODE_ENV=test node tests/index.js | tap-spec",
+    "bench": "NODE_ENV=test node bench/index.js"
+  },
+  "keywords": [
+    "lz",
+    "string",
+    "compression"
+  ],
+  "author": "Immutable, LLC",
+  "license": "MIT",
+  "dependencies": {
+    "@immutabl3/utils": "^1.0.1"
+  },
+  "devDependencies": {
+    "benchmark": "^2.1.4",
+    "lz-string": "^1.4.4",
+    "tap-spec": "^5.0.0",
+    "tape": "^5.3.2",
+    "tape-describe": "^1.0.3"
+  }
+}
