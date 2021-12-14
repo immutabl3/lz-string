@@ -1,8 +1,18 @@
 import Benchmark from 'benchmark';
 import lzstring from 'lz-string';
-import { compress, decompress } from '../src/index.js';
+import immlzstring from '../dist/index.cjs';
 import path from 'path';
 import fs from 'fs';
+
+const {
+  compress,
+  decompress,
+} = lzstring;
+
+const {
+  compress: immCompress,
+  decompress: immDecompress,
+} = immlzstring;
 
 const data = fs.readFileSync(path.resolve(process.cwd(), 'bench/data.json')).toString();
 const compressedData = compress(data);
@@ -17,17 +27,17 @@ const suite = new Benchmark.Suite()
   });
 
 suite.add('lz-string: compress', () => {
-  return lzstring.compress(data);
+  return compress(data);
 });
 suite.add('@immutabl3/lz-string: compress', () => {
-  return compress(data);
+  return immCompress(data);
 });
 
 suite.add('lz-string: decompress', () => {
-  return lzstring.decompress(compressedData);
+  return decompress(compressedData);
 });
 suite.add('@immutabl3/lz-string: decompress', () => {
-  return decompress(compressedData);
+  return immDecompress(compressedData);
 });
 
 suite.run();

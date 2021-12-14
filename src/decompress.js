@@ -1,12 +1,11 @@
+const RESET_VALUE = 16384;
+const POW_2_2 = 4; // 2^2
+const POW_2_8 = 256; // 2^8
+const POW_2_16 = 65536; // 2^16
+
+const { fromCharCode } = String;
+
 export default function baseDecompress(compressed) {
-  const RESET_VALUE = 16384;
-  const POW_2_2 = 4; // 2^2
-  const POW_2_8 = 256; // 2^8
-  const POW_2_16 = 65536; // 2^16
-
-  const { fromCharCode } = String;
-  const { pow } = Math;
-
   const getValue = index => compressed.charCodeAt(index) - 32;
 
   const { length } = compressed;
@@ -54,8 +53,7 @@ export default function baseDecompress(compressed) {
       power <<= 1;
     }
     c = fromCharCode(bits);
-  }
-  if (bits === 1) {
+  } else if (bits === 1) {
     bits = 0;
     maxpower = POW_2_16;
     power = 1;
@@ -70,8 +68,9 @@ export default function baseDecompress(compressed) {
       power <<= 1;
     }
     c = fromCharCode(bits);
+  } else if (bits === 2) {
+    return '';
   }
-  if (bits === 2) return '';
   
   dictionary[3] = c;
   result.push(c);
@@ -82,7 +81,7 @@ export default function baseDecompress(compressed) {
     if (data.index > length) return '';
 
     bits = 0;
-    maxpower = pow(2, numBits);
+    maxpower = 2 ** numBits;
     power = 1;
     while (power !== maxpower) {
       resb = data.val & data.position;
@@ -114,8 +113,7 @@ export default function baseDecompress(compressed) {
       dictionary[dictSize++] = fromCharCode(bits);
       c = dictSize - 1;
       enlargeIn--;
-    }
-    if (c === 1) {
+    } else if (c === 1) {
       bits = 0;
       maxpower = POW_2_16;
       power = 1;
@@ -132,11 +130,12 @@ export default function baseDecompress(compressed) {
       dictionary[dictSize++] = fromCharCode(bits);
       c = dictSize - 1;
       enlargeIn--;
+    } else if (c === 2) {
+      return result.join('');
     }
-    if (c === 2) return result.join('');
 
     if (enlargeIn === 0) {
-      enlargeIn = pow(2, numBits);
+      enlargeIn = 2 ** numBits;
       numBits++;
     }
 
@@ -156,7 +155,7 @@ export default function baseDecompress(compressed) {
     w = entry;
 
     if (enlargeIn === 0) {
-      enlargeIn = pow(2, numBits);
+      enlargeIn = 2 ** numBits;
       numBits++;
     }
   }

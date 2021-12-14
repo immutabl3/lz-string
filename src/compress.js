@@ -1,14 +1,13 @@
+const { fromCharCode } = String;
+const getCharFromInt = a => fromCharCode(a + 32);
+
+const BITS_PER_CHAR = 15;
+
 export default function baseCompress(uncompressed) {
-  const { fromCharCode } = String;
-  const getCharFromInt = a => fromCharCode(a + 32);
-
-  const hasOwnProp = (obj, key) => obj[key] !== undefined;
-  const BITS_PER_CHAR = 15;
-  const { pow } = Math;
-
-  const contextDictionary = {};
-  const contextDictionaryToCreate = {};
   const contextData = [];
+
+  const contextDictionary = Object.create(null);
+  const contextDictionaryToCreate = Object.create(null);
   
   let value = 0;
   let contextW = '';
@@ -20,16 +19,16 @@ export default function baseCompress(uncompressed) {
 
   for (let idx = 0; idx < uncompressed.length; idx += 1) {
     const contextC = uncompressed.charAt(idx);
-    if (!hasOwnProp(contextDictionary, contextC)) {
+    if (contextDictionary[contextC] === undefined) {
       contextDictionary[contextC] = contextDictSize++;
       contextDictionaryToCreate[contextC] = true;
     }
 
     const contextWC = contextW + contextC;
-    if (hasOwnProp(contextDictionary, contextWC)) {
+    if (contextDictionary[contextWC] !== undefined) {
       contextW = contextWC;
     } else {
-      if (hasOwnProp(contextDictionaryToCreate, contextW)) {
+      if (contextDictionaryToCreate[contextW] !== undefined) {
         if (contextW.charCodeAt(0) < 256) {
           for (let i = 0; i < contextNumBits; i++) {
             contextDataVal = (contextDataVal << 1);
@@ -81,7 +80,7 @@ export default function baseCompress(uncompressed) {
         }
         contextEnlargeIn--;
         if (contextEnlargeIn === 0) {
-          contextEnlargeIn = pow(2, contextNumBits);
+          contextEnlargeIn = 2 ** contextNumBits;
           contextNumBits++;
         }
         contextDictionaryToCreate[contextW] = undefined;
@@ -101,7 +100,7 @@ export default function baseCompress(uncompressed) {
       }
       contextEnlargeIn--;
       if (contextEnlargeIn === 0) {
-        contextEnlargeIn = pow(2, contextNumBits);
+        contextEnlargeIn = 2 ** contextNumBits;
         contextNumBits++;
       }
       // Add wc to the dictionary.
@@ -112,7 +111,7 @@ export default function baseCompress(uncompressed) {
 
   // Output the code for w.
   if (contextW !== '') {
-    if (hasOwnProp(contextDictionaryToCreate,contextW)) {
+    if (contextDictionaryToCreate[contextW] !== undefined) {
       if (contextW.charCodeAt(0) < 256) {
         for (let i = 0; i < contextNumBits; i++) {
           contextDataVal = (contextDataVal << 1);
@@ -164,7 +163,7 @@ export default function baseCompress(uncompressed) {
       }
       contextEnlargeIn--;
       if (contextEnlargeIn === 0) {
-        contextEnlargeIn = pow(2, contextNumBits);
+        contextEnlargeIn = 2 ** contextNumBits;
         contextNumBits++;
       }
       contextDictionaryToCreate[contextW] = undefined;
@@ -184,7 +183,7 @@ export default function baseCompress(uncompressed) {
     }
     contextEnlargeIn--;
     if (contextEnlargeIn === 0) {
-      contextEnlargeIn = pow(2, contextNumBits);
+      contextEnlargeIn = 2 ** contextNumBits;
       contextNumBits++;
     }
   }
